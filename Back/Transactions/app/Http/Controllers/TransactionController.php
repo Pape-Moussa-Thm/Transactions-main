@@ -55,7 +55,8 @@ class TransactionController extends Controller
                 'montant' => $request->montant,
                 'type_trans' => 'depot',
                 'code' => 'DEP' . time(),
-                'client_id' => $expediteur ? $expediteur : null,
+                'client_id' => $expediteur ? $expediteur->id : null,
+                'expediteur_comlpte_id' => $expediteur ? $expediteur->id : null,
                 'destination_compte_id' => $beneficiaire_compte ? $beneficiaire_compte->id : null,
                 'clientid' => ($request->fournisseur === 'wr') ? ($expediteur ? $expediteur->id : null) : ($request->expediteur ? Client::where('telephone', $request->expediteur)->value('id') : null),
                 'date_transaction' => now()

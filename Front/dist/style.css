@@ -1,5 +1,5 @@
 .container {
-    background-color: whitesmoke;
+    /* background-color: whitesmoke; */
     border: 2px solid #333;
     padding: 20px;
     height: 800px;
@@ -10,10 +10,10 @@
     text-align: right;
 }
 
-h1 {
+/* h1 {
     margin-bottom: 50px;
     color: red;
-}
+} */
 
 hr {
     border: 1px solid #333;

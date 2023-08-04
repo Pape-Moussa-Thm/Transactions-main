@@ -18,7 +18,7 @@ return new class extends Migration
             $table->enum('type_trans', ['depot', 'retrait', 'CbyC']);
             $table->string('code');
             $table->foreignId('expediteur_compte_id')->constrained('comptes')->onDelete('cascade');
-            $table->foreignId('destination_compte_id')->nullable()->constrained('comptes')->onDelete('cascade');
+            $table->foreignId('destination_compte_id')->constrained()->nullable('comptes')->onDelete('cascade');
             $table->foreignId('client_id')->constrained('clients')->onDelete('cascade');
         });
     }

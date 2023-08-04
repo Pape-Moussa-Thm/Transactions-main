@@ -1,24 +1,24 @@
  
- document.getElementById('fournisseur')?.addEventListener('change', function () {
-    const selectElement = document.getElementById('fournisseur') as HTMLSelectElement;
-    const transactionTitles = document.querySelectorAll('.transaction-title') as NodeListOf<HTMLHeadingElement>;
-    const selectedFournisseur = selectElement.value;
+//  document.getElementById('fournisseur')?.addEventListener('change', function () {
+//     const selectElement = document.getElementById('fournisseur') as HTMLSelectElement;
+//     const transactionTitles = document.querySelectorAll('.transaction-title') as NodeListOf<HTMLHeadingElement>;
+//     const selectedFournisseur = selectElement.value;
 
-    transactionTitles.forEach(transactionTitle => {
+//     transactionTitles.forEach(transactionTitle => {
 
-        transactionTitle.classList.remove('om', 'wv', 'wr', 'cb');
+//         transactionTitle.classList.remove('om', 'wv', 'wr', 'cb');
 
-        if (selectedFournisseur === 'om') {
-            transactionTitle.classList.add('om');
-        } else if (selectedFournisseur === 'wv') {
-            transactionTitle.classList.add('wv');
-        } else if (selectedFournisseur === 'wr') {
-            transactionTitle.classList.add('wr');
-        } else if (selectedFournisseur === 'cb') {
-            transactionTitle.classList.add('cb');
-        }
-    })
-});
+//         if (selectedFournisseur === 'om') {
+//             transactionTitle.classList.add('om');
+//         } else if (selectedFournisseur === 'wv') {
+//             transactionTitle.classList.add('wv');
+//         } else if (selectedFournisseur === 'wr') {
+//             transactionTitle.classList.add('wr');
+//         } else if (selectedFournisseur === 'cb') {
+//             transactionTitle.classList.add('cb');
+//         }
+//     })
+// });
 
 async function showNotification(message: string) {
     const notification = document.getElementById('notification') as HTMLDivElement;
@@ -74,6 +74,7 @@ async function makeTransfert() {
 
     const responseData = await response.json();
     console.log('Réponse de l\'API:', responseData);
+    showNotification('transfert effectué')
 
   } catch (error) {
     console.error('Erreur lors de la requête API:', error);
@@ -229,21 +230,21 @@ async function getNomExpediteur(numeroDestinataire: string): Promise<string> {
     }
 }
 
-const infoIcon = document.getElementById('info-icon');
-infoIcon?.addEventListener('click', async function () {
+// const infoIcon = document.getElementById('info-icon');
+// infoIcon?.addEventListener('click', async function () {
 
-  const expediteurInput = document.getElementById('expediteur') as HTMLInputElement;
-  const numero = expediteurInput.value;
-  console.log(numero);
+//   const expediteurInput = document.getElementById('expediteur') as HTMLInputElement;
+//   const numero = expediteurInput.value;
+//   console.log(numero);
   
-  const transactions = await recupererHistoriqueTransactions(numero);
+//   const transactions = await recupererHistoriqueTransactions(numero);
 
-  if (transactions) {
-    mettreAJourContenuModal(transactions);
-    afficherModal();
-  }
+//   if (transactions) {
+//     mettreAJourContenuModal(transactions);
+//     afficherModal();
+//   }
   
-});
+// });
 
 function afficherModal() {
   const transactionHistoryModal = document.getElementById('transactionHistoryModal');
