@@ -27,21 +27,25 @@ hr {
  .transaction-title.om {
      background-color: #f05a22;
      color: #fff;
+     border-radius: 10px;
  }
 
  .transaction-title.wv {
      background-color: #03c4a1;
      color: #fff;
+     border-radius: 10px;
  }
 
  .transaction-title.wr {
      background-color: #ffcc01;
      color: #000;
+     border-radius: 10px;
  }
 
  .transaction-title.cb {
      background-color: #007bff;
      color: #fff;
+     border-radius: 10px;
  }
 
  .btn-primary {
