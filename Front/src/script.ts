@@ -1,24 +1,23 @@
- 
-//  document.getElementById('fournisseur')?.addEventListener('change', function () {
-//     const selectElement = document.getElementById('fournisseur') as HTMLSelectElement;
-//     const transactionTitles = document.querySelectorAll('.transaction-title') as NodeListOf<HTMLHeadingElement>;
-//     const selectedFournisseur = selectElement.value;
+ document.getElementById('fournisseur')?.addEventListener('change', function () {
+    const selectElement = document.getElementById('fournisseur') as HTMLSelectElement;
+    const transactionTitles = document.querySelectorAll('.transaction-title') as NodeListOf<HTMLHeadingElement>;
+    const selectedFournisseur = selectElement.value;
 
-//     transactionTitles.forEach(transactionTitle => {
+    transactionTitles.forEach(transactionTitle => {
 
-//         transactionTitle.classList.remove('om', 'wv', 'wr', 'cb');
+        transactionTitle.classList.remove('om', 'wv', 'wr', 'cb');
 
-//         if (selectedFournisseur === 'om') {
-//             transactionTitle.classList.add('om');
-//         } else if (selectedFournisseur === 'wv') {
-//             transactionTitle.classList.add('wv');
-//         } else if (selectedFournisseur === 'wr') {
-//             transactionTitle.classList.add('wr');
-//         } else if (selectedFournisseur === 'cb') {
-//             transactionTitle.classList.add('cb');
-//         }
-//     })
-// });
+        if (selectedFournisseur === 'om') {
+            transactionTitle.classList.add('om');
+        } else if (selectedFournisseur === 'wv') {
+            transactionTitle.classList.add('wv');
+        } else if (selectedFournisseur === 'wr') {
+            transactionTitle.classList.add('wr');
+        } else if (selectedFournisseur === 'cb') {
+            transactionTitle.classList.add('cb');
+        }
+    })
+});
 
 async function showNotification(message: string) {
     const notification = document.getElementById('notification') as HTMLDivElement;
@@ -183,10 +182,25 @@ const expediteurInput = document.getElementById('expediteur') as HTMLInputElemen
 
 expediteurInput.addEventListener('input', async function () {
     const numeroExpediteur = expediteurInput.value;
-    if (numeroExpediteur) {
-        const nomExpediteur = await getNomExpediteur(numeroExpediteur);
-        document.getElementById('expediteur_nom')?.setAttribute('value', nomExpediteur);
-    }
+    console.log(numeroExpediteur);
+    const nomExpediteur = await getNomExpediteur(numeroExpediteur);
+
+    
+    let a = document.getElementById('expediteur_nom') as HTMLInputElement;
+
+   console.log(a);
+   if (numeroExpediteur.length == 9) {
+    a.value = nomExpediteur
+   }
+   
+    
+    // if (numeroExpediteur) {
+    
+        
+
+    //     console.log(a);
+        
+    // }
 });
 
 async function getNomDestinataire(numeroDestinataire: string): Promise<string> {
@@ -213,8 +227,14 @@ async function getNomDestinataire(numeroDestinataire: string): Promise<string> {
 async function getNomExpediteur(numeroDestinataire: string): Promise<string> {
     try {
         const response = await fetch(`http://127.0.0.1:8000/api/numClient/${numeroDestinataire}`);
+
+        // console.log(response);
+        
         if (response.ok) {
             const client = await response.json();
+
+            console.log(client);
+            
 
             if (client.nom) {
                 return client.prenom + ' ' + client.nom;
@@ -230,21 +250,21 @@ async function getNomExpediteur(numeroDestinataire: string): Promise<string> {
     }
 }
 
-// const infoIcon = document.getElementById('info-icon');
-// infoIcon?.addEventListener('click', async function () {
+const infoIcon = document.getElementById('info-icon');
+infoIcon?.addEventListener('click', async function () {
 
-//   const expediteurInput = document.getElementById('expediteur') as HTMLInputElement;
-//   const numero = expediteurInput.value;
-//   console.log(numero);
+  const expediteurInput = document.getElementById('expediteur') as HTMLInputElement;
+  const numero = expediteurInput.value;
+  console.log(numero);
   
-//   const transactions = await recupererHistoriqueTransactions(numero);
+  const transactions = await recupererHistoriqueTransactions(numero);
 
-//   if (transactions) {
-//     mettreAJourContenuModal(transactions);
-//     afficherModal();
-//   }
+  if (transactions) {
+    mettreAJourContenuModal(transactions);
+    afficherModal()
+  }
   
-// });
+});
 
 function afficherModal() {
   const transactionHistoryModal = document.getElementById('transactionHistoryModal');

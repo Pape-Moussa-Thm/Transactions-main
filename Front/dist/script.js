@@ -1,7 +1,3 @@
-//  document.getElementById('fournisseur')?.addEventListener('change', function () {
-//     const selectElement = document.getElementById('fournisseur') as HTMLSelectElement;
-//     const transactionTitles = document.querySelectorAll('.transaction-title') as NodeListOf<HTMLHeadingElement>;
-//     const selectedFournisseur = selectElement.value;
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,20 +7,27 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var _a;
-//     transactionTitles.forEach(transactionTitle => {
-//         transactionTitle.classList.remove('om', 'wv', 'wr', 'cb');
-//         if (selectedFournisseur === 'om') {
-//             transactionTitle.classList.add('om');
-//         } else if (selectedFournisseur === 'wv') {
-//             transactionTitle.classList.add('wv');
-//         } else if (selectedFournisseur === 'wr') {
-//             transactionTitle.classList.add('wr');
-//         } else if (selectedFournisseur === 'cb') {
-//             transactionTitle.classList.add('cb');
-//         }
-//     })
-// });
+var _a, _b;
+(_a = document.getElementById('fournisseur')) === null || _a === void 0 ? void 0 : _a.addEventListener('change', function () {
+    const selectElement = document.getElementById('fournisseur');
+    const transactionTitles = document.querySelectorAll('.transaction-title');
+    const selectedFournisseur = selectElement.value;
+    transactionTitles.forEach(transactionTitle => {
+        transactionTitle.classList.remove('om', 'wv', 'wr', 'cb');
+        if (selectedFournisseur === 'om') {
+            transactionTitle.classList.add('om');
+        }
+        else if (selectedFournisseur === 'wv') {
+            transactionTitle.classList.add('wv');
+        }
+        else if (selectedFournisseur === 'wr') {
+            transactionTitle.classList.add('wr');
+        }
+        else if (selectedFournisseur === 'cb') {
+            transactionTitle.classList.add('cb');
+        }
+    });
+});
 function showNotification(message) {
     return __awaiter(this, void 0, void 0, function* () {
         const notification = document.getElementById('notification');
@@ -35,7 +38,7 @@ function showNotification(message) {
         notification.style.display = 'none';
     });
 }
-(_a = document.getElementById('validerBtn')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', function () {
+(_b = document.getElementById('validerBtn')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', function () {
     return __awaiter(this, void 0, void 0, function* () {
         const trans_type = document.getElementById('type_transaction');
         const selectedValue = trans_type.value;
@@ -179,13 +182,18 @@ destinataireInput.addEventListener('input', function () {
 });
 const expediteurInput = document.getElementById('expediteur');
 expediteurInput.addEventListener('input', function () {
-    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const numeroExpediteur = expediteurInput.value;
-        if (numeroExpediteur) {
-            const nomExpediteur = yield getNomExpediteur(numeroExpediteur);
-            (_a = document.getElementById('expediteur_nom')) === null || _a === void 0 ? void 0 : _a.setAttribute('value', nomExpediteur);
+        console.log(numeroExpediteur);
+        const nomExpediteur = yield getNomExpediteur(numeroExpediteur);
+        let a = document.getElementById('expediteur_nom');
+        console.log(a);
+        if (numeroExpediteur.length == 9) {
+            a.value = nomExpediteur;
         }
+        // if (numeroExpediteur) {
+        //     console.log(a);
+        // }
     });
 });
 function getNomDestinataire(numeroDestinataire) {
@@ -215,8 +223,10 @@ function getNomExpediteur(numeroDestinataire) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const response = yield fetch(`http://127.0.0.1:8000/api/numClient/${numeroDestinataire}`);
+            // console.log(response);
             if (response.ok) {
                 const client = yield response.json();
+                console.log(client);
                 if (client.nom) {
                     return client.prenom + ' ' + client.nom;
                 }
@@ -234,17 +244,19 @@ function getNomExpediteur(numeroDestinataire) {
         }
     });
 }
-// const infoIcon = document.getElementById('info-icon');
-// infoIcon?.addEventListener('click', async function () {
-//   const expediteurInput = document.getElementById('expediteur') as HTMLInputElement;
-//   const numero = expediteurInput.value;
-//   console.log(numero);
-//   const transactions = await recupererHistoriqueTransactions(numero);
-//   if (transactions) {
-//     mettreAJourContenuModal(transactions);
-//     afficherModal();
-//   }
-// });
+const infoIcon = document.getElementById('info-icon');
+infoIcon === null || infoIcon === void 0 ? void 0 : infoIcon.addEventListener('click', function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        const expediteurInput = document.getElementById('expediteur');
+        const numero = expediteurInput.value;
+        console.log(numero);
+        const transactions = yield recupererHistoriqueTransactions(numero);
+        if (transactions) {
+            mettreAJourContenuModal(transactions);
+            afficherModal();
+        }
+    });
+});
 function afficherModal() {
     const transactionHistoryModal = document.getElementById('transactionHistoryModal');
     if (transactionHistoryModal) {
