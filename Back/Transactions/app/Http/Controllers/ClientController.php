@@ -35,6 +35,25 @@ class ClientController extends Controller
         return $transactions_by_fournisseur;
     }
 
+    public function ajouterClient(Request $request)
+    {
+        // Valider les données entrées par l'utilisateur
+        $request->validate([
+            'nom' => 'required|string',
+            'prenom' => 'required|string',
+            'telephone' => 'required'
+        ]);
+
+        // Créer un nouveau client
+        $client = new Client();
+        $client->nom = $request->nom;
+        $client->prenom = $request->prenom;
+        $client->telephone = $request->telephone;
+        $client->save();
+
+        return response()->json(['success'=>'Client ajouté avec succès.']);
+    }
+
     public function index()
     {
         //

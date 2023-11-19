@@ -3,6 +3,7 @@
     border: 2px solid #333;
     padding: 20px;
     height: 800px;
+    background: linear-gradient(110deg, #fdcd3b 60%, #ffed4b 60%);
 }
 
 .text-right {
@@ -10,10 +11,11 @@
     text-align: right;
 }
 
-/* h1 {
+h1 {
     margin-bottom: 50px;
     color: red;
-} */
+    text-shadow: 2px 2px 8px blue
+}
 
 hr {
     border: 1px solid #333;
@@ -28,24 +30,28 @@ hr {
      background-color: #f05a22;
      color: #fff;
      border-radius: 10px;
+     text-shadow: 2px 2px 8px #000
  }
 
  .transaction-title.wv {
-     background-color: #03c4a1;
+     background-color: #059fffe3;
      color: #fff;
      border-radius: 10px;
+     text-shadow: 2px 2px 8px #000
  }
 
  .transaction-title.wr {
-     background-color: #ffcc01;
-     color: #000;
+     background-color: #0cc303;
+     color: #fff;
      border-radius: 10px;
+     text-shadow: 2px 2px 8px #fff
  }
 
  .transaction-title.cb {
-     background-color: #007bff;
-     color: #fff;
+     background-color: #0d00ff;
+     color: #ebdc34;
      border-radius: 10px;
+     text-shadow: 2px 2px 8px rgb(240, 236, 1)
  }
 
  .btn-primary {
@@ -80,11 +86,34 @@ hr {
     padding: 20px 20px;
     border-radius: 20px;
     z-index: 9999;
+    transition: opacity 1000s ease-in-out;
+    text-align: center;
+}
+.notification.hide {
+    opacity: 0;
+}
+.notification-button {
+    padding: 5px 10px;
+    margin-right: 5px;
+    cursor: pointer;
+    background-color: #023a779a;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    margin-top: 10px;
+}
+.fournisseur-code {
+    margin-top: 10px;
+}
+
+.fournisseur-code span {
+    cursor: pointer;
+    text-decoration: underline;
 }
 
 .notification-message {
-    font-size: 16px;
-    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
 }
 
 .hidden{
@@ -142,3 +171,15 @@ tbody td {
     opacity: 1;
 }
 
+.table-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.sty{
+    margin-left: 1em;
+}
+
+.tabs{
+    display: none;
+}

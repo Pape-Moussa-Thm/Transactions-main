@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -110,35 +111,7 @@ function makeDeposit() {
                 body: JSON.stringify(data),
             });
             if (response.ok) {
-                const responseData = yield response.json();
-                const message = responseData.message;
-                const codeFournisseur = fournisseur.toUpperCase();
-                const numeroDestinataire = destinataire;
-                const notificationElement = document.getElementById('notification');
-                const notificationMessageElement = document.getElementById('notificationMessage');
-                // Créer la notification avec boutons centrés et bouton de copie
-                const notificationHTML = `
-                <div class="notification-content">
-                    <span class="notification-message">${message}</span>
-                    <div class="button-container">
-                        <button class="notification-button" id="copyCodeButton">Copier le code</button>
-                        <button class="notification-button" id="closeButton">Fermer</button>
-                    </div>
-                </div>
-            `;
-                notificationMessageElement.innerHTML = notificationHTML;
-                notificationElement.style.display = 'block';
-                // Gérer l'action du bouton de copie
-                const copyCodeButton = document.getElementById('copyCodeButton');
-                copyCodeButton.addEventListener('click', () => {
-                    copyToClipboard(codeFournisseur + ' ' + numeroDestinataire);
-                    showNotification("Code copié !");
-                });
-                // Gérer l'action du bouton de fermeture
-                const closeButton = document.getElementById('closeButton');
-                closeButton.addEventListener('click', () => {
-                    notificationElement.style.display = 'none';
-                });
+                showNotification("Dépôt effectué avec succès.");
             }
             else {
                 const responseData = yield response.json();
@@ -149,25 +122,6 @@ function makeDeposit() {
             showNotification("Une erreur s'est produite lors du dépôt : " + error.message);
         }
     });
-}
-// Fonction pour copier le texte dans le presse-papiers
-function copyToClipboard(text) {
-    const textArea = document.createElement("textarea");
-    textArea.value = text;
-    document.body.appendChild(textArea);
-    textArea.select();
-    document.execCommand("copy");
-    document.body.removeChild(textArea);
-}
-// Fonction pour afficher la notification
-function _showNotification(message) {
-    const notification = document.getElementById('notification');
-    const notificationMessage = document.getElementById('notificationMessage');
-    notificationMessage.textContent = message;
-    notification.style.display = 'block';
-    setTimeout(() => {
-        notification.style.display = 'none';
-    }, 0);
 }
 function makeRetrait() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -291,7 +245,7 @@ function getNomExpediteur(numeroDestinataire) {
         }
     });
 }
-const infoIcon = document.getElementById('info-icon');
+const InfoIcon = document.getElementById('info-icon');
 infoIcon === null || infoIcon === void 0 ? void 0 : infoIcon.addEventListener('click', function () {
     return __awaiter(this, void 0, void 0, function* () {
         const expediteurInput = document.getElementById('expediteur');
@@ -378,7 +332,7 @@ function mettreAJourContenuModal(transactions) {
     }
 }
 const addClient = document.getElementById('addClient');
-addClient.addEventListener('click', () => __awaiter(this, void 0, void 0, function* () {
+addClient.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
     const nomInput = document.getElementById('nom');
     const prenomInput = document.getElementById('prenom');
     const telephoneInput = document.getElementById('telephone');
@@ -409,7 +363,7 @@ addClient.addEventListener('click', () => __awaiter(this, void 0, void 0, functi
     }
 }));
 const addCompte = document.getElementById('addCompte');
-addCompte.addEventListener('click', () => __awaiter(this, void 0, void 0, function* () {
+addCompte.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
     const fournisseurInput = document.getElementById('four');
     const telephoneInput = document.getElementById('phone');
     const fournisseur = fournisseurInput.value;
@@ -436,7 +390,7 @@ addCompte.addEventListener('click', () => __awaiter(this, void 0, void 0, functi
 }));
 const listerComptesBtn = document.querySelector('#listerCompte');
 const tableBody = document.getElementById('comptesTableBody');
-listerComptesBtn.addEventListener('click', () => __awaiter(this, void 0, void 0, function* () {
+listerComptesBtn.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const response = yield fetch('http://127.0.0.1:8000/api/listerCompte');
         if (response.ok) {
@@ -488,10 +442,10 @@ function afficherComptesDansTableau(comptes) {
         actionCell.appendChild(boutonFermer);
     });
 }
-function fermerCompte(client_id) {
+function fermerCompte(numCompte) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const response = yield fetch(`http://127.0.0.1:8000/api/comptes/fermer/${client_id}`, {
+            const response = yield fetch(`http://127.0.0.1:8000/api/deleteCompte/${numCompte}`, {
                 method: 'GET',
             });
             if (response.ok) {
@@ -506,10 +460,10 @@ function fermerCompte(client_id) {
         }
     });
 }
-function bloquerCompte(num_Compte) {
+function bloquerCompte(numCompte) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const response = yield fetch(`http://127.0.0.1:8000/api/comptes/bloquer/${num_Compte}`, {
+            const response = yield fetch(`http://127.0.0.1:8000/api/bloquerCompte/${numCompte}`, {
                 method: 'GET',
             });
             if (response.ok) {
@@ -564,10 +518,10 @@ function annulerTransaction(codeTransaction) {
         }
     });
 }
-function _recupererHistoriqueTransactions(clientId) {
+function recupererHistoriqueTransactions(numero) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const response = yield fetch(`http://127.0.0.1:8000/api/clients/${clientId}/historique-transactions`);
+            const response = yield fetch(`http://127.0.0.1:8000/api/transClient/${numero}`);
             if (response.ok) {
                 return yield response.json();
             }
@@ -581,7 +535,7 @@ function _recupererHistoriqueTransactions(clientId) {
         }
     });
 }
-const InfoIcon = document.getElementById('info-icon');
+const infoIcon = document.getElementById('info-icon');
 infoIcon === null || infoIcon === void 0 ? void 0 : infoIcon.addEventListener('click', function () {
     return __awaiter(this, void 0, void 0, function* () {
         const expediteurInput = document.getElementById('expediteur');
@@ -623,7 +577,7 @@ function afficherTransactions(transactions) {
 }
 const a = document.getElementById('ordreDate');
 const b = document.getElementById('ordreMontant');
-a.addEventListener('change', () => __awaiter(this, void 0, void 0, function* () {
+a.addEventListener('change', () => __awaiter(void 0, void 0, void 0, function* () {
     const expediteurInput = document.getElementById('expediteur');
     const numero = expediteurInput.value;
     const transactions = yield recupererHistoriqueTransactions(numero);
@@ -631,7 +585,7 @@ a.addEventListener('change', () => __awaiter(this, void 0, void 0, function* () 
         appliquerFiltresDate(transactions);
     }
 }));
-b.addEventListener('change', () => __awaiter(this, void 0, void 0, function* () {
+b.addEventListener('change', () => __awaiter(void 0, void 0, void 0, function* () {
     const expediteurInput = document.getElementById('expediteur');
     const numero = expediteurInput.value;
     const transactions = yield recupererHistoriqueTransactions(numero);

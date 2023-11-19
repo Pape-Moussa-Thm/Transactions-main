@@ -106,9 +106,40 @@ async function makeDeposit() {
             },
             body: JSON.stringify(data),
         });
-
-       if (response.ok) {
-            showNotification("Dépôt effectué avec succès.");
+    
+        if (response.ok) {
+            const responseData = await response.json();
+            const message = responseData.message;
+            const codeFournisseur = fournisseur.toUpperCase();
+            const numeroDestinataire = destinataire;
+            const notificationElement = document.getElementById('notification');
+            const notificationMessageElement = document.getElementById('notificationMessage');
+            
+            // Créer la notification avec boutons centrés et bouton de copie
+            const notificationHTML = `
+                <div class="notification-content">
+                    <span class="notification-message">${message}</span>
+                    <div class="button-container">
+                        <button class="notification-button" id="copyCodeButton">Copier le code</button>
+                        <button class="notification-button" id="closeButton">Fermer</button>
+                    </div>
+                </div>
+            `;
+            notificationMessageElement.innerHTML = notificationHTML;
+            notificationElement.style.display = 'block';
+            
+            // Gérer l'action du bouton de copie
+            const copyCodeButton = document.getElementById('copyCodeButton');
+            copyCodeButton.addEventListener('click', () => {
+                copyToClipboard(codeFournisseur + ' ' + numeroDestinataire);
+                showNotification("Code copié !");
+            });
+            
+            // Gérer l'action du bouton de fermeture
+            const closeButton = document.getElementById('closeButton');
+            closeButton.addEventListener('click', () => {
+                notificationElement.style.display = 'none';
+            });
         } else {
             const responseData = await response.json();
             showNotification("Erreur lors du dépôt : " + responseData.error);
@@ -117,6 +148,29 @@ async function makeDeposit() {
         showNotification("Une erreur s'est produite lors du dépôt : " + error.message);
     }
 }
+
+
+// Fonction pour copier le texte dans le presse-papiers
+function copyToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textArea);
+}
+
+// Fonction pour afficher la notification
+function _showNotification(message) {
+    const notification = document.getElementById('notification');
+    const notificationMessage = document.getElementById('notificationMessage');
+    notificationMessage.textContent = message;
+    notification.style.display = 'block';
+    setTimeout(() => {
+        notification.style.display = 'none';
+    }, 0);
+}
+
 
 async function makeRetrait() {
     const expediteurInput = document.getElementById('expediteur') as HTMLInputElement;
@@ -192,11 +246,7 @@ expediteurInput.addEventListener('input', async function () {
    if (numeroExpediteur.length == 9) {
     a.value = nomExpediteur
    }
-   
-    
     // if (numeroExpediteur) {
-    
-        
 
     //     console.log(a);
         
@@ -351,3 +401,322 @@ function mettreAJourContenuModal(transactions: any) {
   }
 }
 
+
+const addClient = document.getElementById('addClient') as HTMLButtonElement;
+addClient.addEventListener('click', async () => {
+
+    const nomInput = document.getElementById('nom') as HTMLInputElement;
+    const prenomInput = document.getElementById('prenom') as HTMLInputElement;
+    const telephoneInput = document.getElementById('telephone') as HTMLInputElement;
+
+    const nom = nomInput.value;
+    const prenom = prenomInput.value;
+    const telephone = telephoneInput.value;
+
+    try {
+        const response = await fetch('http://127.0.0.1:8000/api/clients', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                nom: nom,
+                prenom: prenom,
+                telephone: telephone,
+            }),
+        });
+
+        if (response.ok) {
+            showNotification('Le client a été ajouté avec succès');
+        } else {
+            showNotification('Erreur lors de l\'ajout du client');
+        }
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout du client :', error);
+    }
+});
+
+const addCompte = document.getElementById('addCompte') as HTMLButtonElement;
+addCompte.addEventListener('click', async () => {
+
+    const fournisseurInput = document.getElementById('four') as HTMLSelectElement;
+    const telephoneInput = document.getElementById('phone') as HTMLInputElement;
+
+    const fournisseur = fournisseurInput.value;
+    const telephone = telephoneInput.value;
+
+    try {
+        const response = await fetch('http://127.0.0.1:8000/api/addCompte', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                fournisseur: fournisseur,
+                telephone: telephone,
+            }),
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            showNotification(responseData.message);
+        }
+    } catch (error) {
+        console.error('Erreur lors de l\'ajout du client :', error);
+    }
+});
+
+const listerComptesBtn = document.querySelector('#listerCompte') as HTMLButtonElement;
+const tableBody = document.getElementById('comptesTableBody') as HTMLTableSectionElement;
+
+listerComptesBtn.addEventListener('click', async () => {
+    try {
+        const response = await fetch('http://127.0.0.1:8000/api/listerCompte');
+        if (response.ok) {
+            const comptes = await response.json();
+            afficherComptesDansTableau(comptes);
+        } else {
+            console.error('Erreur lors de la récupération des comptes');
+        }
+    } catch (error) {
+        console.error('Erreur lors de la récupération des comptes :', error);
+    }
+});
+
+const tabs = document.querySelector('.tabs') as HTMLElement;
+
+function afficherComptesDansTableau(comptes: any[]) {
+    tableBody.innerHTML = '';
+    tabs.style.display = 'block';
+
+    comptes.forEach((compte) => {
+        const row = tableBody.insertRow();
+
+        const num_compte = row.insertCell();
+        num_compte.textContent = compte.num_compte;
+
+        const solde = row.insertCell();
+        solde.textContent = compte.solde;
+
+        const prenomCell = row.insertCell();
+        prenomCell.textContent = compte.fournisseur;
+
+        const telephoneCell = row.insertCell();
+        telephoneCell.textContent = compte.client_id;
+
+        const etat = row.insertCell();
+        etat.textContent = compte.etat;
+
+        const actionCell = row.insertCell();
+
+        const boutonBloquer = document.createElement('button');
+        boutonBloquer.textContent = 'Bloquer';
+        boutonBloquer.addEventListener('click', () => {
+          bloquerCompte(compte.num_compte);
+        });
+
+        const boutonDeBloquer = document.createElement('button');
+        boutonDeBloquer.textContent = 'Débloquer';
+        boutonDeBloquer.addEventListener('click', () => {
+          debloquerCompte(compte.num_compte);
+        });
+
+        const boutonFermer = document.createElement('button');
+        boutonFermer.textContent = 'Fermer';
+        boutonFermer.addEventListener('click', ()=>{
+          fermerCompte(compte.num_compte);
+        })
+
+        actionCell.appendChild(boutonBloquer);
+        actionCell.appendChild(boutonDeBloquer);
+        actionCell.appendChild(boutonFermer);
+
+    });
+}
+
+async function fermerCompte(client_id: string) {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/comptes/fermer/${client_id}`, {
+        method: 'GET',
+      })
+      if (response.ok) {
+        showNotification('Compte fermé avec succès')
+      }else{
+        showNotification('Erreur lors de la fermeture du compte')
+      }
+      
+    } catch (error) {
+      console.error('Erreur lors de la fermeture:', error);
+      
+    }
+}
+
+async function bloquerCompte(num_Compte) {
+    try {
+        const response = await fetch(`http://127.0.0.1:8000/api/comptes/bloquer/${num_Compte}`, {
+            method:'GET',
+        });
+
+        if (response.ok) {
+            showNotification('Compte bloqué avec succès');
+        } else {
+            showNotification('Erreur lors du blocage du compte');
+        }
+    } catch (error) {
+        console.error('Erreur lors du blocage du compte:', error);
+    }   
+}
+
+
+async function debloquerCompte(numCompte: string) {
+    try {
+        const response = await fetch(`http://127.0.0.1:8000/api/debloquerCompte/${numCompte}`, {
+            method: 'GET',
+        });
+
+        if (response.ok) {
+            showNotification('Compte débloqué avec succès');
+        } else {
+            showNotification('Erreur lors du déblocage du compte');
+        }
+    } catch (error) {
+        console.error('Erreur lors du déblocage du compte:', error);
+    }
+}
+
+async function annulerTransaction(codeTransaction: string) {
+    try {
+        const response = await fetch(`http://127.0.0.1:8000/api/annulerTransaction/${codeTransaction}`, {
+            method: 'GET',
+        });
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log(responseData);
+            
+            showNotification(responseData.message);
+          } else {
+            const errorData = await response.json();
+            console.log(errorData);
+
+            showNotification(errorData.message);
+          }
+    } catch (error) {
+        console.error('Erreur lors de l\'annulation de la transaction:', error);
+    }
+}
+
+async function _recupererHistoriqueTransactions(clientId: string) {
+  try {
+    const response = await fetch(`http://127.0.0.1:8000/api/clients/${clientId}/historique-transactions`);
+    if (response.ok) {
+      return await response.json();
+    } else {
+      throw new Error("Impossible de récupérer l'historique des transactions.");
+    }
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+const InfoIcon = document.getElementById('info-icon');
+infoIcon?.addEventListener('click', async function () {
+
+  const expediteurInput = document.getElementById('expediteur') as HTMLInputElement;
+  const numero = expediteurInput.value;
+  
+  const transactions = await recupererHistoriqueTransactions(numero);
+
+  if (transactions) {
+    afficherTransactions(transactions.transactions);
+  }
+
+});
+
+function afficherTransactions(transactions: any[]) {
+  const tableBody = document.querySelector('#histoTrans');
+  console.log(tableBody);
+  
+  if (tableBody) {
+    tableBody.innerHTML = '';
+
+    for (const transaction of transactions) {
+      const row = document.createElement('tr');
+
+      const montantCell = document.createElement('td');
+      montantCell.textContent = transaction.montant;
+      row.appendChild(montantCell);
+
+      const typeCell = document.createElement('td');
+      typeCell.textContent = transaction.type_trans;
+      row.appendChild(typeCell);
+
+      const codeCell = document.createElement('td');
+      codeCell.textContent = transaction.code;
+      row.appendChild(codeCell);
+
+      const dateCell = document.createElement('td');
+      dateCell.textContent = transaction.date_transaction;
+      row.appendChild(dateCell);
+
+      const deleteTrans = document.createElement('button');
+      deleteTrans.textContent = "Annuler";
+      row.appendChild(deleteTrans);
+
+      deleteTrans.addEventListener('click', () => {
+        annulerTransaction(transaction.code);
+      });
+
+      tableBody.appendChild(row);
+    }
+  }
+}
+
+const a = document.getElementById('ordreDate') as HTMLSelectElement;
+const b = document.getElementById('ordreMontant') as HTMLSelectElement;
+
+a.addEventListener('change', async () => {
+  const expediteurInput = document.getElementById('expediteur') as HTMLInputElement;
+  const numero = expediteurInput.value;
+  const transactions = await recupererHistoriqueTransactions(numero);
+  if (transactions) {
+    appliquerFiltresDate(transactions);
+  }
+});
+
+b.addEventListener('change', async() => {
+  const expediteurInput = document.getElementById('expediteur') as HTMLInputElement;
+  const numero = expediteurInput.value;
+  const transactions = await recupererHistoriqueTransactions(numero);
+  if (transactions) {
+    appliquerFiltresMontant(transactions);
+  }
+});
+
+async function appliquerFiltresDate(transactions) {
+  const byDate = a.value;
+
+  let transactionsFiltrees = [...transactions.transactions];
+
+  if (byDate === 'recent') {
+    transactionsFiltrees.sort((a, b) => new Date(b.date_transaction).getTime() - new Date(a.date_transaction).getTime());
+  } else if (byDate === 'ancien') {
+    transactionsFiltrees.sort((a, b) => new Date(a.date_transaction).getTime() - new Date(b.date_transaction).getTime());
+  }
+
+  afficherTransactions(transactionsFiltrees);
+}
+
+async function appliquerFiltresMontant(transactions) {
+  const byMontant = b.value;
+
+  let transactionsFiltrees = [...transactions.transactions];
+
+  if (byMontant === 'croissant') {
+    transactionsFiltrees.sort((a, b) => a.montant - b.montant);
+  } else if (byMontant === 'decroissant') {
+    transactionsFiltrees.sort((a, b) => b.montant - a.montant);
+  }
+
+  afficherTransactions(transactionsFiltrees);
+}

@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Models\Transaction;
 use App\Models\Compte;
 use App\Models\Client;
+use Validator;
 
 class TransactionController extends Controller
 {
@@ -64,7 +66,8 @@ class TransactionController extends Controller
 
             DB::commit();
 
-            return response()->json(['message' => 'Dépôt effectué avec succès', 'transaction' => $transaction]);
+            $message = 'Dépôt de ' . $request->montant . ' pour le compte ' . $request->fournisseur . '_' . $request->expediteur . ' effectué avec succès. Montant reçu par le destinataire : ' . $transaction->montant . ' sur le compte ' . $request->fournisseur . '_' . $request->destinataire;
+            return response()->json(['message' => $message, 'transaction' => $transaction]);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json(['error' => 'Une erreur s\'est produite lors du dépôt. Veuillez réessayer.', 'details' => $e->getMessage()], 500);
@@ -99,7 +102,8 @@ class TransactionController extends Controller
             'date_transaction' => now()
         ]);
 
-        return response()->json(['message' => 'Retrait effectué avec succès', 'transaction' => $transaction]);
+        $message = 'Dépôt de ' . $request->montant . ' pour le compte ' . $request->fournisseur . '_' . $request->expediteur . ' effectué avec succès. Montant reçu par le destinataire : ' . $transaction->montant;
+        return response()->json(['message' => $message, 'transaction' => $transaction]);
     }
 
     public function transfert(Request $request)
@@ -158,7 +162,8 @@ class TransactionController extends Controller
 
                 DB::commit();
 
-                return response()->json(['message' => 'Transfert effectué avec succès', 'transaction' => $transaction]);
+                $message = 'Transfert de ' . $request->montant . ' pour le compte ' . $request->fournisseur . '_' . $request->expediteur . ' effectué avec succès';
+            return response()->json(['message' => $message, 'transaction' => $transaction]);
             } else {
                 return response()->json(['error' => 'L\'expéditeur et le expediteur doivent être spécifiés pour effectuer le transfert.'], 422);
             }
@@ -167,6 +172,80 @@ class TransactionController extends Controller
             return response()->json(['error' => 'Une erreur s\'est produite lors du transfert. Veuillez réessayer.', 'details' => $e->getMessage()], 500);
         }
     }
+
+
+    public function annulerTransaction(Request $request, $transactionId)
+    {
+        // Trouver la transaction
+        $transaction = Transaction::findOrFail($transactionId);
+
+        // Vérifier si la transaction est déjà annulée
+        if ($transaction->est_annulee) {
+            return response()->json(['message' => 'La transaction est déjà annulée'], 200);
+        }
+
+        // Vérifier si la transaction peut être annulée (si elle a moins d'un jour)
+        if ($this->verifierTransactionAnnulable($transaction)) {
+            // Mettre à jour la transaction pour marquer qu'elle est annulée
+            $transaction->update(['est_annulee' => true]);
+
+            return response()->json(['message' => 'Transaction annulée avec succès'], 200);
+        }
+
+        return response()->json(['error' => 'Impossible d\'annuler la transaction car elle a plus d\'un jour'], 400);
+    }
+
+    private function verifierTransactionAnnulable($transaction)
+    {
+        // Vérifier si la transaction a été effectuée il y a moins d'un jour
+        $now = Carbon::now();
+        $transactionDate = Carbon::parse($transaction->created_at);
+
+        return $transactionDate->diffInHours($now) < 24;
+    }
+
+
+
+    public function historiqueTransactions(Request $request, $clientId)
+    {
+        $request->validate([
+            'date' => 'date_format:Y-m-d',
+            'montant' => 'numeric',
+            'compte' => 'string',
+            'telephone' => 'string'
+        ]);
+
+        $transactions = Transaction::where('client_id', $clientId);
+
+        // Filtrer par date
+        if ($request->has('date')) {
+            $transactions->whereDate('created_at', $request->date);
+        }
+
+        // Filtrer par montant
+        if ($request->has('montant')) {
+            $transactions->where('montant', $request->montant);
+        }
+
+        // Filtrer par numéro de compte
+        if ($request->has('compte')) {
+            $transactions->where(function ($query) use ($request) {
+                $query->where('expediteur_compte_id', $request->compte)
+                    ->orWhere('destination_compte_id', $request->compte);
+            });
+        }
+
+        // Filtrer par téléphone
+        if ($request->has('telephone')) {
+            $transactions->where('telephone', $request->telephone);
+        }
+
+        $historiqueTransactions = $transactions->get();
+
+        return response()->json(['historiqueTransactions' => $historiqueTransactions]);
+    }
+
+
 
     public function index()
     {
